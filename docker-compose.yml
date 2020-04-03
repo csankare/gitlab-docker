@@ -1,0 +1,33 @@
+  version: '3.7'
+  services:
+    gitlabserver:
+      container_name: gitlabserver
+      hostname: gitlab.example.com
+      build: services/gitlabserver
+      restart: always
+      env_file:
+        - ./.env.gitlabserver
+      environment:
+        GITLAB_OMNIBUS_CONFIG: |
+          external_url 'https://gitlab.example.com/'
+          gitlab_rails['gitlab_shell_ssh_port'] = 22
+      ports:
+        - 80
+        - 443
+        - 22
+      volumes:
+        - ./services/gitlabserver/persistence/config:/etc/gitlab
+        - ./services/gitlabserver/persistence/logs:/var/log/gitlab
+        - ./services/gitlabserver/persistence/data:/var/opt/gitlab
+      networks:
+        gitlabnetwork:
+          ipv4_address: 192.168.16.10
+
+  networks:
+    gitlabnetwork:
+        driver: bridge
+        ipam:
+          driver: default
+          config:
+              -
+                subnet: 192.168.16.0/24
